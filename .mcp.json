@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "cockroachdb": {
+      "command": "npx",
+      "args": ["-y", "@cockroachlabs/cockroachdb-mcp-server"],
+      "env": {
+        "COCKROACHDB_CONNECTION_STRING": "REPLACE_WITH_YOUR_COCKROACHDB_URL"
+      }
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import time
 import sys
 from graph.graph import app
+from db import SessionLocal, ensure_vector_schema
 from config import POLL_INTERVAL
 
 
@@ -8,15 +9,16 @@ def run_batch() -> int:
     """Run one full pass: fetch → score → decide → reason → persist.
     Returns the number of alerts processed in this pass."""
     initial_state = {
-        "alerts": [],
-        "current_alert": {},
-        "incidents": [],
-        "obs_count": 0,
-        "incident_id": "",
-        "is_new": False,
-        "score": 0.0,
-        "reasoning": "",
-        "alert_index": 0,
+        "alerts":          [],
+        "current_alert":   {},
+        "incidents":       [],
+        "obs_count":       0,
+        "incident_id":     "",
+        "is_new":          False,
+        "score":           0.0,
+        "reasoning":       "",
+        "alert_index":     0,
+        "alert_embedding": [],   # Gemini embedding carried between reason → persist
     }
     result = app.invoke(initial_state)
     return result["obs_count"]
@@ -24,6 +26,13 @@ def run_batch() -> int:
 
 def main():
     print("[AGENT] Correlation agent started. Press Ctrl+C to stop.\n")
+
+    # Ensure CockroachDB vector schema is ready before the main loop
+    print("[AGENT] Initialising CockroachDB vector schema...")
+    with SessionLocal() as session:
+        ensure_vector_schema(session)
+    print("[AGENT] Schema ready.\n")
+
     total_processed = 0
 
     try:

@@ -1,0 +1,12 @@
+# Secrets — must NEVER be in the image; ECS injects these at runtime
+.env
+
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.git/
+.gitignore
+.vscode/
+*.md
