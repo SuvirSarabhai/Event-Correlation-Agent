@@ -10,4 +10,4 @@ def compute_score(alert, incident):
     score += WEIGHTS["source"] * (1.0 if alert["source_id"] == incident["source_id"] else 0.0)
     score += WEIGHTS["severity"] * min(alert["severity"] / 10.0, 1.0)
 
-    return round(score, 2)
+    return round(float(score), 2)

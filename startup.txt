@@ -1,0 +1,17 @@
+# Terminal 1 — Correlation daemon (keep running)
+cd "d:\Python Workspace\correlation agent"
+venv\Scripts\activate
+python run.py
+
+# Terminal 2 — FastAPI backend  ← NEW
+cd "d:\Python Workspace\correlation agent"
+venv\Scripts\activate
+uvicorn api.main:app --reload --port 8000
+
+# Terminal 3 — React frontend (already running)
+cd "d:\Python Workspace\Incident Management Dashboard"
+
+# http://localhost:5173
+
+
+Once both terminals are running, open http://localhost:8000/docs to see the interactive API docs, and http://localhost:5173 for the dashboard.

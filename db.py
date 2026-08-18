@@ -1,12 +1,12 @@
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
-from config import DB_URL
+from config import DB_URL, MAX_OBSERVATIONS
 
 engine = create_engine(DB_URL)
 SessionLocal = sessionmaker(bind=engine)
 
 
-def fetch_unprocessed_alerts(session, limit=5):
+def fetch_unprocessed_alerts(session, limit=MAX_OBSERVATIONS):
     return session.execute(text("""
         SELECT *
         FROM alerts
@@ -24,30 +24,33 @@ def fetch_open_incidents(session):
     """)).mappings().all()
 
 
-# ✅ UPDATED: create_incident with area, source_id, event_type
 def create_incident(session, incident_id, alert, explanation):
     session.execute(text("""
         INSERT INTO incidents (
             incident_id, status, first_seen, last_seen,
             severity, confidence, alert_count,
             created_at, updated_at, explanation,
-            area, source_id, event_type
+            area, source_id, event_type,
+            geo_lat, geo_lng
         )
         VALUES (
             :id, 'open', :ts, :ts,
             :sev, :conf, 1,
             :ts, :ts, :exp,
-            :area, :source, :event
+            :area, :source, :event,
+            :geo_lat, :geo_lng
         )
     """), {
-        "id": incident_id,
-        "ts": alert["created_at"],
-        "sev": alert["severity"],
-        "conf": alert["confidence"],
-        "exp": explanation,
-        "area": alert["area"],
-        "source": alert["source_id"],
-        "event": alert["event_type"]
+        "id":      incident_id,
+        "ts":      alert["created_at"],
+        "sev":     alert["severity"],
+        "conf":    alert["confidence"],
+        "exp":     explanation,
+        "area":    alert["area"],
+        "source":  alert["source_id"],
+        "event":   alert["event_type"],
+        "geo_lat": alert.get("geo_lat"),
+        "geo_lng": alert.get("geo_lng"),
     })
 
 
